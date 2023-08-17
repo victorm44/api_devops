@@ -23,7 +23,7 @@ def create_genre(genre: Genre):
 
 @app.get('/', tags=['Home'])
 def message():
-    return HTMLResponse('<h1>Blyat</h1>')
+    return HTMLResponse('<h1>Victor</h1>')
 
 @app.get('/movies', response_model=List[Movie], tags=['Movies'])
 def get_movies():
