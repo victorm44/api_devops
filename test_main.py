@@ -20,7 +20,7 @@ def test_read_main():
 def test_read_movies():
     response = client.get("/movies")
     assert response.status_code == 200
-    assert len(response.json()) >= 0  
+    assert len(response.json()) > 0  
 
 def test_read_single_movie():
     response = client.get("/movies/1")
