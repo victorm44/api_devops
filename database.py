@@ -19,10 +19,10 @@ class Genre(BaseModel):
     name: str
     description: str
 
-db_connection = mysql.connector.connect(
+    db_connection = mysql.connector.connect(
     host="localhost",
     user="root",
-    password="mysecretpassword",
+    password="my-secret-pw",
     database="devops"
 )
 db_cursor = db_connection.cursor()
