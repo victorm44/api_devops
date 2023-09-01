@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - master
-  pull_request:
-    branches:
-      - master
 
 jobs:
   test:
@@ -46,4 +43,29 @@ jobs:
       - name: Build Docker image
         run: docker build -t victorm44/mysql:${{ github.sha }} .
 
+      - name: Notify Slack for Approval
+        uses: rtCamp/action-slack-notify@v2
+        with:
+          status: 'Build ready for approval'
+          text: 'The Docker build is ready for manual approval. Review and confirm.'
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}  # Using the secret here
 
+  manual-approval:
+    runs-on: ubuntu-latest
+    needs: build-and-publish
+    steps:
+      - name: Wait for manual approval
+        id: approval
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            # Implement your logic to wait for external approval here
+            # For example, you could implement a loop that waits for a specific condition
+
+  continue-workflow:
+    runs-on: ubuntu-latest
+    needs: manual-approval
+    steps:
+      - name: Trigger Next Step
+        run: echo "Manual approval received. Proceeding with the next step."
