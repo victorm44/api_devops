@@ -4,13 +4,18 @@ on:
   push:
     branches:
       - master
+  pull_request:
+    branches:
+      - master
 
 jobs:
   test:
+  
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: [3.11]
+
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
@@ -24,9 +29,11 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - name: Static Code Linting with flake8
         run: |
+          # stop the build if there are Python syntax errors or undefined names
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-
+          
   build-and-publish:
     runs-on: ubuntu-latest
     needs: test
@@ -40,32 +47,41 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build Docker image
-        run: docker build -t victorm44/mysql:${{ github.sha }} .
-
-      - name: Notify Slack for Approval
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: .  # Replace with the path to your Dockerfile if different
+          push: true
+          tags: victorm44/mysql:${{ github.sha }}
+  manual-approval:
+    needs: build-and-publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Slack Approval Message
         uses: rtCamp/action-slack-notify@v2
         with:
-          status: 'Build ready for approval'
-          text: 'The Docker build is ready for manual approval. Review and confirm.'
-          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}  # Using the secret here
-
-  manual-approval:
-    runs-on: ubuntu-latest
-    needs: build-and-publish
-    steps:
-      - name: Wait for manual approval
+          status: 'Send approval message'
+          text: 'La imagen de Docker se ha construido y está lista para su aprobación. ¿Deseas aprobarla para su implementación?'
+          channel: '#tu-canal-de-slack'
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+      - name: Wait for Slack Approval
         id: approval
-        uses: actions/github-script@v4
+        run: |
+          echo "Esperando aprobación..."
+          response=$(curl -s https://slack.com/api/conversations.history -X POST -H "Authorization: Bearer $SLACK_TOKEN" -H "Content-type: application/json" --data '{"channel": "tu-canal-de-slack"}')
+          if echo "$response" | jq -e '.messages[0].text | contains("Aprobado")' > /dev/null; then
+            echo "Aprobación recibida. Continuando con la implementación."
+            echo "::set-output name=approved::true"
+          else
+            echo "La implementación no fue aprobada. Deteniendo la subida."
+            echo "::set-output name=approved::false"
+          fi
+        env:
+          SLACK_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      - name: Upload to Docker Hub (if approved)
+        if: steps.approval.outputs.approved == 'true'
+        uses: docker/build-push-action@v2
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            # Implement your logic to wait for external approval here
-            # For example, you could implement a loop that waits for a specific condition
-
-  continue-workflow:
-    runs-on: ubuntu-latest
-    needs: manual-approval
-    steps:
-      - name: Trigger Next Step
-        run: echo "Manual approval received. Proceeding with the next step."
+          context: .
+          push: true
+          tags: victorm44/mysql:${{ github.sha }}
