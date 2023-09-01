@@ -68,7 +68,7 @@ jobs:
         id: approval
         run: |
           echo "Esperando aprobación..."
-          response=$(curl -s https://slack.com/api/conversations.history -X POST -H "Authorization: Bearer $SLACK_BOT_TOKEN" -H "Content-type: application/json" --data '{"channel": "tu-canal-de-slack"}')
+          response=$(curl -s "https://slack.com/api/conversations.history?channel=tu-canal-de-slack" -H "Authorization: Bearer $SLACK_BOT_TOKEN")
           if echo "$response" | jq -e '.messages[0].text | contains("Aprobado")' > /dev/null; then
             echo "Aprobación recibida. Continuando con la implementación."
             echo "::set-output name=approved::true"
@@ -77,11 +77,4 @@ jobs:
             echo "::set-output name=approved::false"
           fi
         env:
-          SLACK_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-      - name: Upload to Docker Hub (if approved)
-        if: steps.approval.outputs.approved == 'true'
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          push: true
-          tags: victorm44/mysql:${{ github.sha }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
