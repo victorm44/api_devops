@@ -68,7 +68,7 @@ jobs:
         id: approval
         run: |
           echo "Esperando aprobación..."
-          response=$(curl -s https://slack.com/api/conversations.history -X POST -H "Authorization: Bearer $SLACK_TOKEN" -H "Content-type: application/json" --data '{"channel": "tu-canal-de-slack"}')
+          response=$(curl -s https://slack.com/api/conversations.history -X POST -H "Authorization: Bearer $SLACK_BOT_TOKEN" -H "Content-type: application/json" --data '{"channel": "tu-canal-de-slack"}')
           if echo "$response" | jq -e '.messages[0].text | contains("Aprobado")' > /dev/null; then
             echo "Aprobación recibida. Continuando con la implementación."
             echo "::set-output name=approved::true"
