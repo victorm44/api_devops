@@ -19,7 +19,7 @@ class Genre(BaseModel):
     name: str
     description: str
 
-    db_connection = mysql.connector.connect(
+db_connection = mysql.connector.connect(
     host="localhost",
     user="root",
     password="my-secret-pw",
