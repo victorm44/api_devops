@@ -54,3 +54,29 @@ jobs:
           push: true
           tags: victorm44/mysql:${{ github.sha }}
 
+    manual-approval:
+    needs: build-and-publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Slack Approval Message
+        uses: rtCamp/action-slack-notify@v2
+        with:
+          status: 'Send approval message'
+          text: 'La imagen de Docker se ha construido y está lista para su aprobación. ¿Deseas aprobarla para su implementación?'
+          channel: '#tu-canal-de-slack'
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+      - name: Wait for Slack Approval
+        id: approval
+        run: |
+          echo "Esperando aprobación..."
+          response=$(curl -s "https://slack.com/api/conversations.history?channel=tu-canal-de-slack" -H "Authorization: Bearer $SLACK_BOT_TOKEN")
+          if echo "$response" | jq -e '.messages[0].text | contains("Aprobado")' > /dev/null; then
+            echo "Aprobación recibida. Continuando con la implementación."
+            echo "::set-output name=approved::true"
+          else
+            echo "La implementación no fue aprobada. Deteniendo la subida."
+            echo "::set-output name=approved::false"
+          fi
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+
