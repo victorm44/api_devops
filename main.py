@@ -4,6 +4,11 @@ from typing import List
 from pydantic import BaseModel
 from database import Genre, Movie, create_tables, insert_genre, get_all_genres, close_connection, \
     create_movie_table, insert_movie, get_all_movies, update_movie, close_connection
+from fastapi import FastAPI
+
+app = FastAPI()
+
+
 
 app = FastAPI()
 create_tables()
@@ -82,3 +87,7 @@ def delete_movie(id: int):
 @app.on_event("shutdown")
 def shutdown_event():
     close_connection()
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=80)
