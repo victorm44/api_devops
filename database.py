@@ -20,10 +20,10 @@ class Genre(BaseModel):
     description: str
 
 db_connection = mysql.connector.connect(
-    host="database-devops.cngxgieez1vi.us-east-1.rds.amazonaws.com",
-    user="admin",
-    password="admindevops",
-    database="devops"
+    host="devopsdb.mysql.database.azure.com",
+    user="devops",
+    password="Database%pwd",
+    database="devopsdb"
 )
 db_cursor = db_connection.cursor()
 

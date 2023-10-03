@@ -8,8 +8,6 @@ from fastapi import FastAPI
 
 app = FastAPI()
 
-
-
 app = FastAPI()
 create_tables()
 create_movie_table()
