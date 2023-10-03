@@ -27,7 +27,7 @@ jobs:
 
     - name: Tag image
       run: |
-        docker tag devops-udem:latest ${vars.ECR_REPOSITORY_URL}/devops-udem:latest
+        docker tag devops-udem:latest ${{ secrets.ECR_REPOSITORY_URL }}/devops-udem:latest
 
   deploy:
     runs-on: ubuntu-latest
@@ -47,8 +47,8 @@ jobs:
 
     - name: Pull image
       run: |
-        docker pull ${vars.ECR_REPOSITORY_URL}/devops-udem:latest
+        docker pull ${{ secrets.ECR_REPOSITORY_URL }}/devops-udem:latest
 
     - name: Run image
       run: |
-        docker run -p 3000:3000 -d ${vars.ECR_REPOSITORY_URL}/devops-udem:latest
+        docker run -p 3000:3000 -d ${{ secrets.ECR_REPOSITORY_URL }}/devops-udem:latest
