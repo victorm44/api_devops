@@ -27,11 +27,11 @@ jobs:
 
     - name: Tag image
       run: |
-        docker tag backend-app:latest ${{ secrets.ECR_REPOSITORY_URL }}/backend-app:latest
+        docker tag docker tag devops-udem:devops-${{ github.run_id }} ${{vars.ECR_REPOSITORY_URL}}/devops-udem:devops-${{ github.run_id }}
 
     - name: Push image
       run: |
-        docker push ${{ secrets.ECR_REPOSITORY_URL }}/backend-app:latest
+        docker push ${{ secrets.ECR_REPOSITORY_URL }}/backend-app:devops-${{ github.run_id }}
 
   deploy:
     runs-on: ubuntu-latest
