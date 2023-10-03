@@ -14,6 +14,8 @@ jobs:
 
     - name: Configure AWS credentials
       env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_REGION: us-east-1
       run: |
         aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }} --region ${{ env.AWS_REGION }}       
@@ -40,6 +42,8 @@ jobs:
 
     - name: Configure AWS credentials
       env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_REGION: us-east-1
       run: |
         aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }} --region ${{ env.AWS_REGION }}       
@@ -48,7 +52,3 @@ jobs:
     - name: Pull image
       run: |
         docker pull ${{ secrets.ECR_REPOSITORY_URL }}/backend-app:latest
-
-    - name: Run image
-      run: |
-        docker run -p 3000:3000 ${{ secrets.ECR_REPOSITORY_URL }}/backend-app:latest
