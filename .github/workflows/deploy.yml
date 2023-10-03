@@ -23,15 +23,15 @@ jobs:
 
     - name: Build docker image
       run: |
-        docker build -t backend-app .
+        docker build -t devops-udem:latest .
 
     - name: Tag image
       run: |
-        docker tag docker tag devops-udem:devops-${{ github.run_id }} ${{vars.ECR_REPOSITORY_URL}}/devops-udem:devops-${{ github.run_id }}
+        docker tag devops-udem:latest devops-udem:latest
 
     - name: Push image
       run: |
-        docker push ${{ secrets.ECR_REPOSITORY_URL }}/backend-app:devops-${{ github.run_id }}
+        docker push devops-udem:latest
 
   deploy:
     runs-on: ubuntu-latest
@@ -51,4 +51,8 @@ jobs:
 
     - name: Pull image
       run: |
-        docker pull ${{ secrets.ECR_REPOSITORY_URL }}/backend-app:latest
+        docker pull devops-udem:latest
+
+    - name: Run image
+      run: |
+        docker run -p 3000:3000 -d devops-udem:latest
