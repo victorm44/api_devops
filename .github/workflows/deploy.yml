@@ -29,7 +29,7 @@ jobs:
         docker build -t devops-udem:latest .
     - name: Tag image
       run: |
-        docker tag devops-udem:latest ${{ secrets.ECR_REPOSITORY_URL }}/devops-udem:latest
+        docker tag devops-udem:latest ${{ secrets.ECR_REPOSITORY_URL }}/backend-app:latest
     - name: Push image
       run: |
-        docker push ${{ secrets.ECR_REPOSITORY_URL }}/devops-udem:latest
+        docker push ${{ secrets.ECR_REPOSITORY_URL }}/backend-app:latest
