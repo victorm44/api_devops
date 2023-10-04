@@ -16,8 +16,8 @@ jobs:
       env:
           AWS_REGION: us-east-1
       run: |
-          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }} --region ${{ vars.AWS_REGION }}       
-          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }} --region ${{ vars.AWS_REGION }}    
+          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }} --region ${{ env.AWS_REGION }}       
+          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }} --region ${{ env.AWS_REGION }}    
     
     - name: ECR log-in
       run: aws ecr get-login-password --region ${{ vars.AWS_REGION }} | docker login --username AWS --password-stdin ${{vars.ECR_REPOSITORY_URL}}
