@@ -28,3 +28,6 @@ jobs:
     - name: Tag image
       run: |
         docker tag devops-udem:latest ${{ secrets.ECR_REPOSITORY_URL }}/devops-udem:latest
+    - name: Push image
+      run: |
+        docker push ${{ secrets.ECR_REPOSITORY_URL }}/devops-udem:latest
