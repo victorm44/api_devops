@@ -20,6 +20,8 @@ jobs:
           aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }} --region ${{ env.AWS_REGION }}    
     
     - name: ECR log-in
+      env:
+        AWS_REGION: us-east-1
       run: aws ecr get-login-password --region ${{ vars.AWS_REGION }} | docker login --username AWS --password-stdin ${{vars.ECR_REPOSITORY_URL}}
 
     - name: Build docker image
