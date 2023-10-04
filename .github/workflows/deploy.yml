@@ -26,7 +26,7 @@ jobs:
 
     - name: Build docker image
       run: |
-        docker build -t devops-udem:latest .
+        docker build -t backend-app .
 
     - name: Tag image
       run: |
