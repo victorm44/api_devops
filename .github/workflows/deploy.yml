@@ -26,11 +26,10 @@ jobs:
 
     - name: Build docker image
       run: |
-        docker build -t backend-app .
-
+        docker build -t devops-udem:latest .
     - name: Tag image
       run: |
         docker tag devops-udem:latest ${{ secrets.ECR_REPOSITORY_URL }}/devops-udem:latest
     - name: Push image
       run: |
-        docker push 308516746479.dkr.ecr.us-east-2.amazonaws.com/backend-app:latest
+        docker push ${{ secrets.ECR_REPOSITORY_URL }}/devops-udem:latest
