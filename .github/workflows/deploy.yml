@@ -22,14 +22,14 @@ jobs:
     - name: ECR log-in
       env:
         AWS_REGION: us-east-1
-      run: aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 308516746479.dkr.ecr.us-east-2.amazonaws.com
+      run: aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 308516746479.dkr.ecr.us-east-1.amazonaws.com
 
     - name: Build docker image
       run: |
         docker build -t devops-udem:latest .
     - name: Tag image
       run: |
-        docker tag devops-udem:latest ${{ secrets.ECR_REPOSITORY_URL }}/backend-app:latest
+        docker tag devops-udem:latest ${{ secrets.ECR_REPOSITORY_URL }}/devops-udem:latest
     - name: Push image
       run: |
-        docker push ${{ secrets.ECR_REPOSITORY_URL }}/backend-app:latest
+        docker push ${{ secrets.ECR_REPOSITORY_URL }}/devops-udem:latest
