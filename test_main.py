@@ -15,12 +15,12 @@ def teardown_module(module):
 def test_read_main():
     response = client.get("/")
     assert response.status_code == 200
-    assert response.text == '<h1>Blyat</h1>'
+    assert response.text == '<h1>DEVOPS</h1>'
 
 def test_read_movies():
     response = client.get("/movies")
     assert response.status_code == 200
-    assert len(response.json()) >= 0  
+    assert len(response.json()) > 0  
 
 def test_read_single_movie():
     response = client.get("/movies/1")
