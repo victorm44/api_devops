@@ -1,9 +1,9 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse
 from typing import List
 from pydantic import BaseModel
 from database import Genre, Movie, create_tables, insert_genre, get_all_genres, close_connection, \
-    create_movie_table, insert_movie, get_all_movies, update_movie, close_connection
+    create_movie_table, insert_movie, get_all_movies, update_genre, update_movie, close_connection, delete_movie, delete_genre
 from fastapi import FastAPI
 
 app = FastAPI()
@@ -53,6 +53,8 @@ def create_movie(movie: Movie):
     insert_movie(movie)
     return movie
 
+
+
 @app.put('/movies/{id}', response_model=Movie, tags=['Movies'])
 def update_movie_endpoint(id: int, movie: Movie):
     existing_movie = None
@@ -64,23 +66,48 @@ def update_movie_endpoint(id: int, movie: Movie):
             break
 
     if existing_movie is None:
-        return {"message": "Movie not found"}
+        raise HTTPException(status_code=404, detail="Movie not found")
 
     updated_movie = movie.copy(update={'id': existing_movie.id})
     updated = update_movie(updated_movie)
 
     if updated:
         return updated
-    return {"message": "Update failed"}
+    raise HTTPException(status_code=500, detail="Update failed")
+
+@app.put('/genres/{id}', response_model=Genre, tags=['Genres'])
+def update_genre_endpoint(id: int, genre: Genre):
+    existing_genre = None
+    genres = get_all_genres()
+
+    for g in genres:
+        if g.id == id:
+            existing_genre = g
+            break
+
+    if existing_genre is None:
+        raise HTTPException(status_code=404, detail="Genre not found")
+
+    updated_genre = genre.copy(update={'id': existing_genre.id})
+    updated = update_genre(updated_genre)
+
+    if updated:
+        return updated
+    raise HTTPException(status_code=500, detail="Update failed")
 
 @app.delete('/movies/{id}', response_model=Movie, tags=['Movies'])
-def delete_movie(id: int):
-    movies = get_all_movies()
-    for movie in movies:
-        if movie.id == id:
-            deleted_movie = movie
-            return deleted_movie
-    return {"message": "Movie not found"}
+def delete_movie_endpoint(id: int):
+    deleted_movie = delete_movie(id)
+    if deleted_movie:
+        return deleted_movie
+    raise HTTPException(status_code=404, detail="Movie not found")
+
+@app.delete('/genres/{id}', response_model=Genre, tags=['Genres'])
+def delete_genre_endpoint(id: int):
+    deleted_genre = delete_genre(id)
+    if deleted_genre:
+        return deleted_genre
+    raise HTTPException(status_code=404, detail="Genre not found")
 
 @app.on_event("shutdown")
 def shutdown_event():

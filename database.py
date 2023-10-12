@@ -84,39 +84,77 @@ def get_all_genres() -> List[Genre]:
             genres.append(genre)
         return genres
     
+def update_genre(updated_genre: Genre) -> Optional[Genre]:
+    with db_lock:
+        query = """
+            UPDATE genres
+            SET name = %s, description = %s
+            WHERE id = %s
+        """
+        values = (
+            updated_genre.name,
+            updated_genre.description,
+            updated_genre.id,
+        )
+
+        db_cursor.execute(query, values)
+        db_connection.commit()
+
+        return updated_genre
+
+    
 def update_movie(updated_movie: Movie) -> Optional[Movie]:
-    try:
-        with db_lock:
-            db_connection = mysql.connector.connect(
-                host="your_db_host",
-                user="your_db_user",
-                password="your_db_password",
-                database="your_db_name"
-            )
-            
-            db_cursor = db_connection.cursor()
+    with db_lock:
+        query = """
+            UPDATE movies
+            SET title = %s, overview = %s, year = %s, rating = %s, category = %s
+            WHERE id = %s
+        """
+        values = (
+            updated_movie.title,
+            updated_movie.overview,
+            updated_movie.year,
+            updated_movie.rating,
+            updated_movie.category,
+            updated_movie.id,
+        )
 
-            db_cursor.execute('''
-                UPDATE movies
-                SET title=%s, overview=%s, year=%s, rating=%s, category=%s
-                WHERE id=%s
-            ''', (
-                updated_movie.title,
-                updated_movie.overview,
-                updated_movie.year,
-                updated_movie.rating,
-                updated_movie.category,
-                updated_movie.id
-            ))
+        db_cursor.execute(query, values)
+        db_connection.commit()
 
-            db_connection.commit()
-            db_cursor.close()
-            db_connection.close()
+        return updated_movie
 
-            return updated_movie
-    except Exception as e:
-        print("Error updating movie:", e)
-        return None
+
+def delete_movie(movie_id: int) -> Optional[Movie]:
+    with db_lock:
+        query = "DELETE FROM movies WHERE id = %s"
+        db_cursor.execute(query, (movie_id,))
+        db_connection.commit()
+
+        # Comprueba si algún registro fue eliminado
+        if db_cursor.rowcount > 0:
+            # Devuelve None en lugar de crear una instancia de Movie
+            return None
+        else:
+            return None  # La película no fue encontrada
+
+    
+# En database.py
+def delete_genre(genre_id: int) -> Optional[Genre]:
+    with db_lock:
+        query = "DELETE FROM genres WHERE id = %s"
+        db_cursor.execute(query, (genre_id,))
+        db_connection.commit()
+
+        # Comprueba si algún registro fue eliminado
+        if db_cursor.rowcount > 0:
+            # Devuelve None en lugar de crear una instancia de Genre
+            return None
+        else:
+            return None  # El género no fue encontrado
+
+
+
     
 def drop_table(table_name: str):
     with db_lock:
