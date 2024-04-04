@@ -6,6 +6,7 @@ from database import Genre, Movie, create_tables, insert_genre, get_all_genres, 
     create_movie_table, insert_movie, get_all_movies, update_genre, update_movie, close_connection, delete_movie, delete_genre
 from fastapi import FastAPI
 
+
 app = FastAPI()
 
 app = FastAPI()
