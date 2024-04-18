@@ -5,127 +5,86 @@ import threading
 
 db_lock = threading.Lock()
 
-
-class Movie(BaseModel):
+class Modulo(BaseModel):
     id: Optional[int] = None
-    title: str
-    overview: str
-    year: int
-    rating: float
-    category: str
+    nombre: str
+    duracion: int
+    nivel: str
 
-class Genre(BaseModel):
+class Curso(BaseModel):
     id: Optional[int] = None
-    name: str
-    description: str
+    titulo: str
+    descripcion: str
+    precio: float
+    duracion: int
 
 db_connection = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="mysecretpassword",
+    host="devops0001.mysql.database.azure.com",
+    user="devops",
+    password="#braian987",
     database="devops"
 )
 db_cursor = db_connection.cursor()
 
-
-def create_movie_table():
+def create_modulo_table():
     with db_lock:
         db_cursor.execute('''
-            CREATE TABLE IF NOT EXISTS movies (
+            CREATE TABLE IF NOT EXISTS modulos (
                 id INT AUTO_INCREMENT PRIMARY KEY,
-                title VARCHAR(255) NOT NULL,
-                overview TEXT,
-                year INT,
-                rating FLOAT,
-                category VARCHAR(255)
+                nombre VARCHAR(255) NOT NULL,
+                duracion INT,
+                nivel VARCHAR(255)
             )
         ''')
         db_connection.commit()
 
-def insert_movie(movie: Movie):
+def insert_modulo(modulo: Modulo):
     with db_lock:
-        query = "INSERT INTO movies (title, overview, year, rating, category) VALUES (%s, %s, %s, %s, %s)"
-        values = (movie.title, movie.overview, movie.year, movie.rating, movie.category)
+        query = "INSERT INTO modulos (nombre, duracion, nivel) VALUES (%s, %s, %s)"
+        values = (modulo.nombre, modulo.duracion, modulo.nivel)
         db_cursor.execute(query, values)
         db_connection.commit()
 
-def get_all_movies() -> List[Movie]:
+def get_all_modulos() -> List[Modulo]:
     with db_lock:
-        db_cursor.execute("SELECT id, title, overview, year, rating, category FROM movies")
-        movies = []
+        db_cursor.execute("SELECT id, nombre, duracion, nivel FROM modulos")
+        modulos = []
         for row in db_cursor.fetchall():
-            movie = Movie(id=row[0], title=row[1], overview=row[2], year=row[3], rating=row[4], category=row[5])
-            movies.append(movie)
-        return movies
-    
-def create_tables():
+            modulo = Modulo(id=row[0], nombre=row[1], duracion=row[2], nivel=row[3])
+            modulos.append(modulo)
+        return modulos
+
+def create_curso_table():
     with db_lock:
         db_cursor.execute('''
-            CREATE TABLE IF NOT EXISTS genres (
+            CREATE TABLE IF NOT EXISTS cursos (
                 id INT AUTO_INCREMENT PRIMARY KEY,
-                name VARCHAR(255) NOT NULL,
-                description TEXT
+                titulo VARCHAR(255) NOT NULL,
+                descripcion TEXT,
+                precio FLOAT,
+                duracion INT
             )
         ''')
         db_connection.commit()
 
-def insert_genre(genre: Genre):
+def insert_curso(curso: Curso):
     with db_lock:
-        query = "INSERT INTO genres (name, description) VALUES (%s, %s)"
-        values = (genre.name, genre.description)
+        query = "INSERT INTO cursos (titulo, descripcion, precio, duracion) VALUES (%s, %s, %s, %s)"
+        values = (curso.titulo, curso.descripcion, curso.precio, curso.duracion)
         db_cursor.execute(query, values)
         db_connection.commit()
 
-def get_all_genres() -> List[Genre]:
+def get_all_cursos() -> List[Curso]:
     with db_lock:
-        db_cursor.execute("SELECT id, name, description FROM genres")
-        genres = []
+        db_cursor.execute("SELECT id, titulo, descripcion, precio, duracion FROM cursos")
+        cursos = []
         for row in db_cursor.fetchall():
-            genre = Genre(id=row[0], name=row[1], description=row[2])
-            genres.append(genre)
-        return genres
-    
-def update_movie(updated_movie: Movie) -> Optional[Movie]:
-    try:
-        with db_lock:
-            db_connection = mysql.connector.connect(
-                host="your_db_host",
-                user="your_db_user",
-                password="your_db_password",
-                database="your_db_name"
-            )
-            
-            db_cursor = db_connection.cursor()
+            curso = Curso(id=row[0], titulo=row[1], descripcion=row[2], precio=row[3], duracion=row[4])
+            cursos.append(curso)
+        return cursos
 
-            db_cursor.execute('''
-                UPDATE movies
-                SET title=%s, overview=%s, year=%s, rating=%s, category=%s
-                WHERE id=%s
-            ''', (
-                updated_movie.title,
-                updated_movie.overview,
-                updated_movie.year,
-                updated_movie.rating,
-                updated_movie.category,
-                updated_movie.id
-            ))
-
-            db_connection.commit()
-            db_cursor.close()
-            db_connection.close()
-
-            return updated_movie
-    except Exception as e:
-        print("Error updating movie:", e)
-        return None
-    
-def drop_table(table_name: str):
-    with db_lock:
-        db_cursor.execute(f"DROP TABLE IF EXISTS {table_name}")
-        db_connection.commit()
-
-#drop_table("genres")
-
+# Otras funciones como update_modulo, delete_modulo, update_curso, delete_curso, etc., seguirían un patrón similar.
+# Se han omitido aquí por brevedad, pero puedes implementarlas de manera análoga.
 
 def close_connection():
     db_connection.close()
