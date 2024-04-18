@@ -1,14 +1,12 @@
-FROM python:3.11-alpine
+FROM python:3.12
 
-WORKDIR /api
+WORKDIR /app
 
-COPY ./requirements.txt /api/requirements.txt
+COPY requirements.txt requirements.txt
+RUN pip install -r requirements.txt
 
-RUN pip install --no-cache-dir --upgrade -r /api/requirements.txt
-RUN pip install mysql-connector-python
+COPY . .
 
-COPY  . /api
+EXPOSE 5000
 
-EXPOSE 8000
-
-CMD ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["python", "-m", "flask", "run", "--host=0.0.0.0"]

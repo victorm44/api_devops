@@ -1,47 +1,49 @@
-from fastapi.testclient import TestClient
-from main import app
-from database import close_connection, create_tables
+from flask.testing import FlaskClient
+from app import app
+from database import close_connection, create_curso_table, create_modulo_table
 
 # Inicializar el cliente de prueba
-client = TestClient(app)
+client = app.test_client()
 
 def setup_module(module):
-    create_tables()
+    create_modulo_table()
+    create_curso_table()
 
 def teardown_module(module):
     close_connection()
 
-
 def test_read_main():
     response = client.get("/")
     assert response.status_code == 200
-    assert response.text == '<h1>DEVOPS</h1>'
+    assert b"Cursos API" in response.data
 
-def test_read_movies():
-    response = client.get("/movies")
+def test_get_modulos():
+    response = client.get("/modulos")
     assert response.status_code == 200
-    assert len(response.json()) > 0  
+    assert isinstance(response.json, list)
 
-def test_read_single_movie():
-    response = client.get("/movies/1")
-    assert response.status_code == 200
-    assert response.json()["title"] == "Inception"
-
-def test_read_movies_by_category():
-    response = client.get("/movies/?category=Acción&year=2001")
-    assert response.status_code == 200
-    assert len(response.json()) >= 0 
-
-# Pruebas de creación
-def test_create_movie():
-    new_movie = {
-        "title": "New Movie",
-        "overview": "New movie overview",
-        "year": 2023,
-        "rating": 8.0,
-        "category": "Sci-Fi"
+def test_create_modulo():
+    new_modulo = {
+        "nombre": "Nuevo Módulo",
+        "duracion": 120,
+        "nivel": "Intermedio"
     }
-    response = client.post("/movies", json=new_movie)
+    response = client.post("/modulos", json=new_modulo)
     assert response.status_code == 200
-    assert response.json()["title"] == new_movie["title"]
+    assert response.json["nombre"] == new_modulo["nombre"]
 
+def test_get_cursos():
+    response = client.get("/cursos")
+    assert response.status_code == 200
+    assert isinstance(response.json, list)
+
+def test_create_curso():
+    new_curso = {
+        "titulo": "Nuevo Curso",
+        "descripcion": "Descripción del nuevo curso",
+        "precio": 99.99,
+        "duracion": 240
+    }
+    response = client.post("/cursos", json=new_curso)
+    assert response.status_code == 200
+    assert response.json["titulo"] == new_curso["titulo"]

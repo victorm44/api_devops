@@ -8,7 +8,7 @@ Install the required dependencies using pip:
 
 Run the application:
 ```bash
-    uvicorn main:app --reload
+     python -m flask run --host=0.0.0.0 
 ```
 
 mysecretpassword
